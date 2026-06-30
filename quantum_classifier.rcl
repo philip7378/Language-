@@ -1,0 +1,45 @@
+// quantum_classifier.rcl
+// Implements the Born Rule (Section 7) for probabilistic AI inference.
+
+concept SentimentPositive = { "archetype_positive", "good", "great", "excellent", "amazing" };
+concept SentimentNegative = { "archetype_negative", "bad", "terrible", "awful", "horrible" };
+
+// 1. Training Prototypes
+let p1 = lex("good excellent");
+let p2 = lex("great amazing");
+let n1 = lex("bad terrible");
+let n2 = lex("awful horrible");
+
+let proto_pos = event_element(p1) + event_element(p2);
+let proto_neg = event_element(n1) + event_element(n2);
+
+// 2. Quantum Probability Event
+event quantum_classify(text: String) -> Int {
+    let obs = lex(text);
+    
+    // Calculate Born weights (squared amplitudes)
+    let w_pos = born_weight(obs, proto_pos);
+    let w_neg = born_weight(obs, proto_neg);
+    
+    // Normalize to create a probability distribution
+    let total = w_pos + w_neg;
+    let p_pos = w_pos / total;
+    let p_neg = w_neg / total;
+    
+    print(p_pos);
+    print(p_neg);
+    
+    // Collapse to the highest probability sector
+    if (p_pos > p_neg) { 1 } else { 0 }
+}
+
+// 3. Test the Probabilities
+print(111); // Testing strongly positive
+let r1 = quantum_classify("excellent amazing");
+
+print(222); // Testing mixed signal
+let r2 = quantum_classify("good terrible");
+
+print(333); // Testing strongly negative
+let r3 = quantum_classify("awful horrible") {
+        dump_geometry("quantum_classifier.html")};;
