@@ -1,0 +1,37 @@
+// app.rcl – Demonstrates the native RCL standard library
+
+// 1. Define some helper events
+event double(x: Int) -> Int {
+    x * 2
+}
+
+event is_even(x: Int) -> Int {
+    // A simple parity check (assuming integer scalars)
+    let half = x / 2;
+    let check = half * 2;
+    if (check == x) { 1 } else { 0 }
+}
+
+event add_pair(pair: Int) -> Int {
+    let a = head(pair);
+    let b = tail(pair);
+    a + b
+}
+
+// 2. Build a list: 10 -> 20 -> 30 -> 40 -> 0
+let l1 = cons(10, 0);
+let l2 = cons(20, l1);
+let l3 = cons(30, l2);
+let l4 = cons(40, l3);
+
+// 3. Map: Double every element
+let doubled = map(l4, "double");
+print(sum(doubled)); // Expected: (40+60+80+20)*2 = 200
+
+// 4. Filter: Keep only even numbers
+let evens = filter(l4, "is_even");
+print(length(evens)); // Expected: 2 (20 and 40)
+
+// 5. Fold: Sum all elements using fold and add_pair
+let total = fold(l4, 0, "add_pair");
+print(total); // Expected: 100

@@ -1,0 +1,107 @@
+// core.rcl – The RCL Standard Library
+// This file is automatically loaded by the rcs binary at startup.
+// It defines higher-order functional programming natively in RCL.
+
+// map: Applies an event to every element in a causal list.
+// Returns a new causal list containing the results.
+event map(list: Int, func_name: String) -> Int {
+    if (list == 0) { 0 }
+    else {
+        let h = head(list);
+        let t = tail(list);
+        
+        // Dynamically call the function on the head element
+        let new_h = apply(func_name, h);
+        
+        // Recursively map the tail
+        let new_t = map(t, func_name);
+        
+        // Link the new head to the new tail
+        execute_after(new_h, new_t)
+    }
+}
+
+// filter: Returns a new list containing only elements where 
+// the predicate event returns 1.
+event filter(list: Int, pred_name: String) -> Int {
+    if (list == 0) { 0 }
+    else {
+        let h = head(list);
+        let t = tail(list);
+        
+        let passes = apply(pred_name, h);
+        let next_tail = filter(t, pred_name);
+        
+        if (passes > 0) {
+            execute_after(h, next_tail)
+        } else {
+            next_tail
+        }
+    }
+}
+
+// fold: Accumulates a value by applying an event to each element 
+// and an accumulator. (Note: For simplicity, this returns the final 
+// accumulated EventId, not a list).
+event fold(list: Int, acc: Int, func_name: String) -> Int {
+    if (list == 0) { acc }
+    else {
+        let h = head(list);
+        let t = tail(list);
+        
+        // Create a cons cell containing (acc, h) so the function can access both
+        let pair = cons(h, acc);
+        let new_acc = apply(func_name, pair);
+        
+        fold(t, new_acc, func_name)
+    }
+}
+
+// core.rcl – The RCL Standard Library
+
+event help() {
+    print_str("=========================================");
+    print_str("   RCL (Relational Core Language) v1.0   ");
+    print_str("=========================================");
+    print_str("");
+    print_str("1. VARIABLES & BINDINGS:");
+    print_str("   let name = value;");
+    print_str("");
+    print_str("2. EVENTS (Functions):");
+    print_str("   event name(param: Type) -> Type {");
+    print_str("       body_expression");
+    print_str("   }");
+    print_str("");
+    print_str("3. CONCEPTS (Semantic Anchors):");
+    print_str("   concept Name = { \"word1\", \"word2\" };");
+    print_str("");
+    print_str("4. CONTROL FLOW:");
+    print_str("   if (condition) { expr } else { expr };");
+    print_str("   * Note: Logical AND is multiplication (*), OR is addition (+)");
+    print_str("");
+    print_str("5. NATIVE DATA STRUCTURES (Causal Lists):");
+    print_str("   let list = cons(10, 0);");
+    print_str("   let val = head(list);");
+    print_str("   let next = tail(list);");
+    print_str("   let len = length(list);");
+    print_str("");
+    print_str("6. FUNCTIONAL TOOLKIT:");
+    print_str("   map(list, \"func_name\");");
+    print_str("   filter(list, \"pred_name\");");
+    print_str("   fold(list, acc, \"func_name\");");
+    print_str("");
+    print_str("7. PHYSICS & AI PRIMITIVES:");
+    print_str("   lex(text) -> Int (Ingests text into causal graph)");
+    print_str("   age_events(dt) (Advances thermodynamic time)");
+    print_str("   correlate(obs, proto) (Measures geometric resonance)");
+    print_str("   born_weight(obs, proto) (Quantum probability)");
+    print_str("   dump_geometry(\"file.html\") (Visualize 3D space)");
+    print_str("");
+    print_str("8. SCRIPT EXECUTION:");
+    print_str("   End scripts with ;; to execute in REPL.");
+    print_str("   Run files with: rcs script.rcl");
+    print_str("");
+    1
+}
+
+// ... (map, filter, fold definitions remain below)
