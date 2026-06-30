@@ -1,0 +1,44 @@
+
+
+// stream.rcl – Real-time Streaming Sentiment Classifier
+
+concept SentimentPositive = { "archetype_positive", "good", "great", "excellent", "amazing" };
+concept SentimentNegative = { "archetype_negative", "bad", "terrible", "awful", "horrible" };
+
+let p1 = lex("good excellent");
+let p2 = lex("great amazing");
+let n1 = lex("bad terrible");
+let n2 = lex("awful horrible");
+
+let proto_pos = event_element(p1) + event_element(p2);
+let proto_neg = event_element(n1) + event_element(n2);
+
+event classify_event(obs_id: Int) -> Int {
+    let pos_score = correlate(obs_id, proto_pos);
+    let neg_score = correlate(obs_id, proto_neg);
+    print(pos_score);
+    print(neg_score);
+    if (pos_score > neg_score) { 1 } else { 0 }
+}
+
+event process_stream(obs_id: Int, epoch: Int) {
+    if (obs_id == 0) { 0 }
+    else {
+        let result = classify_event(obs_id);
+        print(result);
+        
+        age_events(0.5);
+        
+        let is_checkpoint = (epoch == 0) + (epoch == 3) + (epoch == 6);
+        if (is_checkpoint > 0) {
+            dump_geometry("stream_geometry.html");
+            print(999);
+        } else { 0 };
+        
+        let next_id = tail(obs_id);
+        process_stream(next_id, epoch + 1);
+    }
+}
+
+let stream_head = lex_file_lines("stream.log");
+process_stream(stream_head, 0);;
