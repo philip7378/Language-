@@ -1,0 +1,61 @@
+// blackhole.rcl – Section 6: Black Holes as Unreconciled Relational Sectors
+// Demonstrates horizon formation, information preservation, and Hawking emission.
+
+concept SentimentPositive = { "archetype_positive", "good", "great", "excellent" };
+concept SentimentNegative = { "archetype_negative", "bad", "terrible", "awful" };
+
+// 1. Create training data
+let p1 = lex("good excellent");
+let n1 = lex("bad terrible");
+
+let proto_pos = event_element(p1);
+let proto_neg = event_element(n1);
+
+// 2. Ingest observations
+let obs1 = lex("excellent work");
+let obs2 = lex("terrible failure");
+let obs3 = lex("good great");
+
+print(100); // Epoch 0: All events are accessible
+
+// 3. Check initial horizon ratios (all should be ~1.0)
+let h1 = check_horizon(obs1);
+print(h1); // ~1.0 (no horizon)
+
+// 4. Age the system moderately
+age_events(5.0);
+print(200); // Epoch 1: Burden accumulating
+
+let h2 = check_horizon(obs1);
+print(h2); // Should be significantly < 1.0
+
+// 5. Isolate obs1 behind a black hole horizon
+isolate_sector(obs1);
+print(300); // Epoch 2: Black hole formed
+
+let h3 = check_horizon(obs1);
+print(h3); // Near zero — exterior accessibility collapsed
+
+// 6. Verify information is preserved (boundary record)
+let boundary = boundary_record(obs1);
+print(boundary); // > 0 means holographic recovery is possible
+
+// 7. Compute entropy of the black hole sector
+let entropy = region_entropy(obs1);
+print(entropy); // log(1 + boundary_links)
+
+// 8. Verify the algebraic state is UNTOUCHED
+// (Information conservation — the core thesis)
+let pos_score = born_weight(obs1, proto_pos);
+let neg_score = born_weight(obs1, proto_neg);
+let total = pos_score + neg_score;
+let p_pos = pos_score / total;
+print(p_pos); // Still classifies correctly despite isolation!
+
+// 9. Hawking emission — system relaxes by shedding lowest-burden event
+print(400); // Epoch 3: Hawking radiation
+let emitted = emit_hawking();
+print(emitted); // Returns the EventId of the lightest sector
+
+// 10. Dump geometry to see the black hole
+dump_geometry("blackhole_geometry.html");;
